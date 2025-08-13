@@ -6,7 +6,7 @@ use App\Models\Enrollment;
 use App\Repositories\Interfaces\EnrollmentRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
 
-class EnrollmentItemRepository implements EnrollmentRepositoryInterface
+class EnrollmentRepository implements EnrollmentRepositoryInterface
 {
     /**
      * Mendapatkan semua pendaftaran.
