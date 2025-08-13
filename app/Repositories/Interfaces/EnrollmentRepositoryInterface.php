@@ -23,6 +23,23 @@ interface EnrollmentRepositoryInterface
      */
     public function findByStudentAndCourse(string $studentId, string $courseId): ?Enrollment;
 
+
+    /**
+     * Mencari pendaftaran berdasarkan id.
+     *
+     * @param string $enrollId
+     * @return Enrollment|null
+     */
+    public function find(string $enrollId): ?Enrollment;
+
+    /**
+     * Mencari kursus yang sudah dibeli user (payment status = PAID) 
+     * 
+     * @param string $studentId
+     * @return Collection<int,Enrollment>
+     */
+    public function getPurchasedByUser(string $studentId): Collection;
+
     /**
      * Membuat pendaftaran baru.
      *
@@ -38,6 +55,8 @@ interface EnrollmentRepositoryInterface
      * @param array $data
      * @return Enrollment
      */
+
+
     public function update(string $id, array $data): Enrollment;
 
     /**

@@ -15,7 +15,7 @@ class EnrollmentRepository implements EnrollmentRepositoryInterface
      */
     public function getAll(): Collection
     {
-        return Enrollment::all();
+        return Enrollment::with(['student', 'course'])->get();
     }
 
     /**
@@ -30,6 +30,32 @@ class EnrollmentRepository implements EnrollmentRepositoryInterface
         $enrollment = Enrollment::where("student_id", $studentId)
             ->where("course_id", $courseId)->first();
         return $enrollment;
+    }
+
+
+    /**
+     * Mencari pendaftaran berdasarkan id.
+     *
+     * @param string $enrollId
+     * @return Enrollment|null
+     */
+    public function find(string $enrollId): ?Enrollment
+    {
+        return Enrollment::with('course')->find($enrollId);
+    }
+
+    /**
+     * Mencari kursus yang sudah dibeli user (payment status = PAID) 
+     * 
+     * @param string $studentId
+     * @return Collection<int,Enrollment>
+     */
+    public function getPurchasedByUser(string $studentId): Collection
+    {
+        return Enrollment::with('course')
+            ->where('student_id', $studentId)
+            ->where('payment_status', 'PAID')
+            ->get();
     }
 
     /**
