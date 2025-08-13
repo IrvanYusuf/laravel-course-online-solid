@@ -28,7 +28,21 @@ class CourseItemRepository implements CourseItemRepositoryInterface
      */
     public function find(string $id): ?CourseItem
     {
-        return CourseItem::findOrFail($id);
+        return CourseItem::find($id);
+    }
+
+    /**
+     * Mencari materi berdasarkan title dan courseId kursus item.
+     *
+     * @param string $title
+     * @param string $courseId
+     * @return CourseItem|null
+     */
+    public function findByTitle(string $title, string $courseId): ?CourseItem
+    {
+        $checkExistingTitle = CourseItem::where("title", $title)
+            ->where("course_id", $courseId)->first();
+        return $checkExistingTitle;
     }
 
     /**

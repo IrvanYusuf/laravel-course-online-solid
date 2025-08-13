@@ -24,6 +24,15 @@ interface CourseItemRepositoryInterface
     public function find(string $id): ?CourseItem;
 
     /**
+     * Mencari materi berdasarkan title dan courseId kursus item.
+     *
+     * @param string $courseId
+     * @param string $title
+     * @return CourseItem|null
+     */
+    public function findByTitle(string $title, string $courseId): ?CourseItem;
+
+    /**
      * Membuat materi baru.
      *
      * @param array $data
