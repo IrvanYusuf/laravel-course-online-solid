@@ -42,7 +42,7 @@ class UserRepository implements UserRepositoryInterface
      */
     public function findById(string $userId): ?User
     {
-        return User::findOrFail($userId);
+        return User::find($userId);
     }
 
     /**

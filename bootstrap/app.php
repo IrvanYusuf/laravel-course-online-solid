@@ -3,6 +3,7 @@
 use App\Exceptions\InvalidCredentialsException;
 use App\Exceptions\UnauthorizedException;
 use App\Exceptions\UserAlreadyExistsException;
+use App\Exceptions\UserNotFoundException;
 use App\Http\Middleware\JwtMiddleware;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -35,7 +36,7 @@ return Application::configure(basePath: dirname(__DIR__))
                 'errors' => [
                     'credentials' => $e->getMessage()
                 ]
-            ], 400);
+            ], 401);
         });
 
         $exceptions->renderable(function (UnauthorizedException $e, $request) {
@@ -43,6 +44,14 @@ return Application::configure(basePath: dirname(__DIR__))
                 'errors' => [
                     'credentials' => $e->getMessage()
                 ]
-            ], 400);
+            ], 403);
+        });
+
+        $exceptions->renderable(function (UserNotFoundException $e, $request) {
+            return response()->json([
+                'errors' => [
+                    'user' => $e->getMessage()
+                ]
+            ], 404);
         });
     })->create();
