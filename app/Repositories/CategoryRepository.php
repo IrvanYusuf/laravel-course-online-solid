@@ -31,7 +31,21 @@ class CategoryRepository implements CategoryRepositoryInterface
      */
     public function find(string $id): Category
     {
-        return Category::findOrFail($id);
+        return Category::find($id);
+    }
+
+    /**
+     * 
+     * Mendapatkan data kategori berdasarkan name
+     * 
+     * @param string $name
+     * 
+     * @return Category
+     * 
+     */
+    public function findByName(string $name): Category
+    {
+        return Category::where("name", $name)->first();
     }
 
     /**

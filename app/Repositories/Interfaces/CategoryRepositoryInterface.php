@@ -23,6 +23,14 @@ interface CategoryRepositoryInterface
     public function find(string $id): Category;
 
     /**
+     * Mencari kategory berdasarkan name.
+     *
+     * @param string $name
+     * @return Category
+     */
+    public function findByName(string $name): Category;
+
+    /**
      * Membuat kategori baru.
      *
      * @param array $data
