@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\CourseItemController;
+use App\Http\Controllers\EnrollmentController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -71,5 +72,15 @@ Route::group(["middleware" => "auth"], function () {
         Route::post("/", [CourseItemController::class, "store"]);
         Route::patch("/{courseItemId}", [CourseItemController::class, "update"]);
         Route::delete("/{courseItemId}", [CourseItemController::class, "destroy"]);
+    });
+
+    // enrollment routes
+    Route::prefix("enrollments")->group(function () {
+        Route::get("/", [EnrollmentController::class, "index"]);
+        Route::get("/detail/{id}", [EnrollmentController::class, "show"]);
+        Route::get("/my-courses", [EnrollmentController::class, "getMyCourses"]);
+        Route::post("/", [EnrollmentController::class, "store"]);
+        Route::patch("/{id}", [EnrollmentController::class, "update"]);
+        Route::delete("/{id}", [EnrollmentController::class, "destroy"]);
     });
 });
