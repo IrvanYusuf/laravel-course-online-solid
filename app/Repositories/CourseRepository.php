@@ -26,7 +26,18 @@ class CourseRepository implements CourseRepositoryInterface
      */
     public function find(string $id): ?Course
     {
-        return Course::findOrFail($id);
+        return Course::find($id);
+    }
+
+    /**
+     * Mencari kursus berdasarkan title.
+     *
+     * @param string $title
+     * @return Course|null
+     */
+    public function findByTitle(string $title): Course|null
+    {
+        return Course::where("title", $title)->first();
     }
 
     /**

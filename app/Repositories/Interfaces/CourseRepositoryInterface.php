@@ -23,6 +23,14 @@ interface CourseRepositoryInterface
     public function find(string $id): ?Course;
 
     /**
+     * Mencari kursus berdasarkan title.
+     *
+     * @param string $title
+     * @return Course|null
+     */
+    public function findByTitle(string $title): ?Course;
+
+    /**
      * Membuat kursus baru.
      *
      * @param array $data
