@@ -1,5 +1,7 @@
 <?php
 
+use App\Exceptions\CategoryAlreadyExistsException;
+use App\Exceptions\CategoryNotFoundException;
 use App\Exceptions\InvalidCredentialsException;
 use App\Exceptions\UnauthorizedException;
 use App\Exceptions\UserAlreadyExistsException;
@@ -53,5 +55,21 @@ return Application::configure(basePath: dirname(__DIR__))
                     'user' => $e->getMessage()
                 ]
             ], 404);
+        });
+
+        $exceptions->renderable(function (CategoryNotFoundException $e, $request) {
+            return response()->json([
+                'errors' => [
+                    'category' => $e->getMessage()
+                ]
+            ], 404);
+        });
+
+        $exceptions->renderable(function (CategoryAlreadyExistsException $e, $request) {
+            return response()->json([
+                'errors' => [
+                    'category' => $e->getMessage()
+                ]
+            ], 400);
         });
     })->create();

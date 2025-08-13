@@ -26,10 +26,10 @@ class CategoryRepository implements CategoryRepositoryInterface
      * 
      * @param string $id
      * 
-     * @return Category
+     * @return Category|null
      * 
      */
-    public function find(string $id): Category
+    public function find(string $id): ?Category
     {
         return Category::find($id);
     }
@@ -40,10 +40,10 @@ class CategoryRepository implements CategoryRepositoryInterface
      * 
      * @param string $name
      * 
-     * @return Category
+     * @return Category|null
      * 
      */
-    public function findByName(string $name): Category
+    public function findByName(string $name): ?Category
     {
         return Category::where("name", $name)->first();
     }

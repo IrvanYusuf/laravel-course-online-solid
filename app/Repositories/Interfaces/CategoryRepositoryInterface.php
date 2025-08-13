@@ -18,17 +18,17 @@ interface CategoryRepositoryInterface
      * Mencari kategory berdasarkan ID.
      *
      * @param string $id
-     * @return Category
+     * @return Category|null
      */
-    public function find(string $id): Category;
+    public function find(string $id): ?Category;
 
     /**
      * Mencari kategory berdasarkan name.
      *
      * @param string $name
-     * @return Category
+     * @return Category|null
      */
-    public function findByName(string $name): Category;
+    public function findByName(string $name): ?Category;
 
     /**
      * Membuat kategori baru.
