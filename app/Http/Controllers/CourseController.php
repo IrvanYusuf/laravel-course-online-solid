@@ -17,7 +17,7 @@ class CourseController extends Controller
     protected $courseService;
 
     /**
-     * CategoryController constructor.
+     * CourseController constructor.
      *
      * @param CourseService $courseService
      */
