@@ -7,8 +7,8 @@ use App\Exceptions\UnauthorizedException;
 use App\Exceptions\UserAlreadyExistsException;
 use App\Repositories\Interfaces\AuthServiceInterface;
 use App\Repositories\Interfaces\UserRepositoryInterface;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthService implements AuthServiceInterface
 {
@@ -35,7 +35,7 @@ class AuthService implements AuthServiceInterface
         $data['password'] = Hash::make($data['password']);
         $user = $this->userRepository->create($data);
 
-        $token = JWTAuth::fromUser($user);
+        $token = Auth::setTTL(60 * 24 * 7)->fromUser($user);
 
         return [
             "token" => $token,
@@ -56,7 +56,7 @@ class AuthService implements AuthServiceInterface
         if (!$user || !Hash::check($credentials['password'], $user->password)) {
             throw new InvalidCredentialsException();
         }
-        $token = JWTAuth::attempt($credentials);
+        $token = Auth::setTTL(60 * 24 * 7)->attempt($credentials);
         return [
             'token' => $token,
             "user" => $user
