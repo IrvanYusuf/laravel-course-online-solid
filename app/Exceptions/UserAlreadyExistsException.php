@@ -2,9 +2,13 @@
 
 namespace App\Exceptions;
 
-use Exception;
 
-class UserAlreadyExistsException extends Exception
+class UserAlreadyExistsException extends BaseException
 {
     protected $message = "User with this email already exists.";
+
+    public function __construct()
+    {
+        parent::__construct("User with this email already exists.", 'category', 400);
+    }
 }

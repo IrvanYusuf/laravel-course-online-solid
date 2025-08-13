@@ -2,9 +2,12 @@
 
 namespace App\Exceptions;
 
-use Exception;
 
-class UnauthorizedException extends Exception
+class UnauthorizedException extends BaseException
 {
-    protected $message = "Unauthorized";
+
+    public function __construct()
+    {
+        parent::__construct("Unauthorized", 'category', 403);
+    }
 }

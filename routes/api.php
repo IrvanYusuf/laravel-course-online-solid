@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\CourseController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -15,6 +16,13 @@ Route::post("/auth/register", [AuthController::class, "register"]);
 Route::prefix("categories")->group(function () {
     Route::get("/", [CategoryController::class, "index"]);
     Route::get("/detail/{categoryId}", [CategoryController::class, "show"]);
+});
+
+
+// courses routes
+Route::prefix("courses")->group(function () {
+    Route::get("/", [CourseController::class, "index"]);
+    Route::get("/detail/{courseId}", [CourseController::class, "show"]);
 });
 
 Route::group(["middleware" => "auth"], function () {
@@ -40,5 +48,14 @@ Route::group(["middleware" => "auth"], function () {
         Route::post("/", [CategoryController::class, "store"]);
         Route::patch("/{categoryId}", [CategoryController::class, "update"]);
         Route::delete("/{categoryId}", [CategoryController::class, "destroy"]);
+    });
+
+
+    // courses routes
+    Route::prefix("courses")->group(function () {
+        Route::post("/", [CourseController::class, "store"]);
+        Route::get("/instructor", [CourseController::class, "getByInstructorId"]);
+        Route::patch("/{courseId}", [CourseController::class, "update"]);
+        Route::delete("/{courseId}", [CourseController::class, "destroy"]);
     });
 });

@@ -1,11 +1,6 @@
 <?php
 
-use App\Exceptions\CategoryAlreadyExistsException;
-use App\Exceptions\CategoryNotFoundException;
-use App\Exceptions\InvalidCredentialsException;
-use App\Exceptions\UnauthorizedException;
-use App\Exceptions\UserAlreadyExistsException;
-use App\Exceptions\UserNotFoundException;
+use App\Exceptions\BaseException;
 use App\Http\Middleware\JwtMiddleware;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -24,52 +19,11 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        $exceptions->renderable(function (UserAlreadyExistsException $e, $request) {
+        $exceptions->renderable(function (BaseException $e, $request) {
             return response()->json([
                 'errors' => [
-                    'email' => $e->getMessage()
+                    $e->getErrorField() => $e->getMessage()
                 ]
-            ], 400);
-        });
-
-
-        $exceptions->renderable(function (InvalidCredentialsException $e, $request) {
-            return response()->json([
-                'errors' => [
-                    'credentials' => $e->getMessage()
-                ]
-            ], 401);
-        });
-
-        $exceptions->renderable(function (UnauthorizedException $e, $request) {
-            return response()->json([
-                'errors' => [
-                    'credentials' => $e->getMessage()
-                ]
-            ], 403);
-        });
-
-        $exceptions->renderable(function (UserNotFoundException $e, $request) {
-            return response()->json([
-                'errors' => [
-                    'user' => $e->getMessage()
-                ]
-            ], 404);
-        });
-
-        $exceptions->renderable(function (CategoryNotFoundException $e, $request) {
-            return response()->json([
-                'errors' => [
-                    'category' => $e->getMessage()
-                ]
-            ], 404);
-        });
-
-        $exceptions->renderable(function (CategoryAlreadyExistsException $e, $request) {
-            return response()->json([
-                'errors' => [
-                    'category' => $e->getMessage()
-                ]
-            ], 400);
+            ], $e->getStatusCode());
         });
     })->create();

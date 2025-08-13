@@ -2,9 +2,11 @@
 
 namespace App\Exceptions;
 
-use Exception;
 
-class CategoryAlreadyExistsException extends Exception
+class CategoryAlreadyExistsException extends BaseException
 {
-    protected $message = "Category with this name allready exists";
+    public function __construct()
+    {
+        parent::__construct("Category with this name allready exists", 'category', 400);
+    }
 }
