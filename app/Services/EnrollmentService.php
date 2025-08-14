@@ -63,12 +63,23 @@ class EnrollmentService
      */
     public function getMyCourses(string $studentId): Collection
     {
+        $start = microtime(true);
+
+        $isFromCache = Cache::has("user_{$studentId}_my_courses");
         // cache selamat 5 menit
-        Log::info('Fetching all my courses from cache.');
-        return Cache::remember("user_{$studentId}_my_courses", 300, function () use ($studentId) {
+        $data = Cache::remember("user_{$studentId}_my_courses", 300, function () use ($studentId) {
             Log::info('Fetching all my courses from database.');
             return $this->enrollmentRepository->getPurchasedByUser($studentId);
         });
+        $end = microtime(true); // Selesai timer
+        $executionTime = ($end - $start) * 1000; // ms
+
+        Log::info('Execution Time', [
+            'source' => $isFromCache ? 'CACHE' : 'DATABASE',
+            'time_ms' => $executionTime
+        ]);
+
+        return $data;
     }
 
 

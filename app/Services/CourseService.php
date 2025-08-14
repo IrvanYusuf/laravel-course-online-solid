@@ -30,12 +30,25 @@ class CourseService
      */
     public function getAllCourses(): Collection
     {
-        // return $this->courseRepository->getAll();
-        Log::info("fetching all courses from cache");
-        return Cache::remember("all_courses", 600, function () {
+        $start = microtime(true);
+
+        $isFromCache = Cache::has('all_courses');
+
+        // cache selama 10 menit
+        $data = Cache::remember("all_courses", 600, function () {
             Log::info("fetching all courses from database");
             return $this->courseRepository->getAll();
         });
+
+        $end = microtime(true); // Selesai timer
+        $executionTime = ($end - $start) * 1000; // ms
+
+        Log::info('Execution Time', [
+            'source' => $isFromCache ? 'CACHE' : 'DATABASE',
+            'time_ms' => $executionTime
+        ]);
+
+        return $data;
     }
 
     /**

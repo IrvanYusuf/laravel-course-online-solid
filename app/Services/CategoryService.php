@@ -25,11 +25,25 @@ class CategoryService
      */
     public function getAllCategories(): Collection
     {
+        $start = microtime(true);
+
+        $isFromCache = Cache::has('categories_all');
+
         // cache selama 10 menit
-        Log::info('Fetching all categories from cache.');
-        return Cache::remember('categories_all', 600, function () {
+        $data = Cache::remember('categories_all', 600, function () {
+            Log::info('Fetching all categories from database.');
             return $this->categoryRepository->getAll();
         });
+
+        $end = microtime(true); // Selesai timer
+        $executionTime = ($end - $start) * 1000; // ms
+
+        Log::info('Execution Time', [
+            'source' => $isFromCache ? 'CACHE' : 'DATABASE',
+            'time_ms' => $executionTime
+        ]);
+
+        return $data;
     }
 
     /**

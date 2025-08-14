@@ -85,6 +85,14 @@ Mengambil semua data kategori.
     }
 ```
 
+**Hasil:**
+
+Sebelum mengambil data dari redis
+![screenshot](public/not-cache-category.png)
+
+Setelah mengambil data dari redis
+![screenshot](public/redis-category.png)
+
 ---
 
 ### 2. GET /api/courses (Layer Service)
@@ -149,6 +157,14 @@ Mengambil semua data kursus.
         return $this->courseRepository->delete($id);
     }
 ```
+
+**Hasil:**
+
+Sebelum mengambil data dari redis
+![screenshot](public/db-course.png)
+
+Setelah mengambil data dari redis
+![screenshot](public/redis-course.png)
 
 ### 3. GET /api/enrollments/my-courses (Layer Service)
 
@@ -227,5 +243,13 @@ Mengambil semua kursus yang sudah dibeli user (payment status = PAID).
         return $this->enrollmentRepository->delete($enrollmentId);
     }
 ```
+
+**Hasil:**
+
+Sebelum mengambil data dari redis
+![screenshot](public/db-my-courses.png)
+
+Setelah mengambil data dari redis
+![screenshot](public/redis-my-courses.png)
 
 ---
