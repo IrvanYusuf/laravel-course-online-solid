@@ -7,7 +7,7 @@ Mendukung **caching dengan Redis** untuk meningkatkan performa, serta **logging*
 
 ## 🚀 Fitur
 
--   **Autentikasi JWT** (login, register, refresh token, logout)
+-   **Autentikasi JWT** (login, register, me, refresh token, logout)
 -   **Manajemen User** (CRUD user, role-based access)
 -   **Manajemen Category** (CRUD kategori kursus)
 -   **Manajemen Course** (CRUD kursus, filter by instructor)
