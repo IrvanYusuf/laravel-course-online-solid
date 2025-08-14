@@ -1,61 +1,233 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🎓 Laravel Course API
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+API ini digunakan untuk mengelola kursus, kategori, pendaftaran, dan pengguna.  
+Mendukung **caching dengan Redis** untuk meningkatkan performa, serta **logging** untuk memantau alur data.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 🚀 Fitur
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+-   **Autentikasi JWT** (login, register, refresh token, logout)
+-   **Manajemen User** (CRUD user, role-based access)
+-   **Manajemen Category** (CRUD kategori kursus)
+-   **Manajemen Course** (CRUD kursus, filter by instructor)
+-   **Manajemen Course Item** (materi kursus)
+-   **Enrollment System** (pendaftaran dan pembelian kursus)
+-   **Redis Caching** untuk optimasi query
+-   **Logging** untuk memantau request dan hit/miss cache
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## 🛠️ Teknologi
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+-   **Laravel 12**
+-   **MySQL**
+-   **Redis** (untuk cache)
+-   **JWT Auth** (`tymon/jwt-auth`)
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+---
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## 🚀 Caching
 
-## Laravel Sponsors
+Caching digunakan untuk menyimpan data yang sifatnya statis atau jarang berubah.  
+Dengan caching, sistem tidak perlu mengambil data yang sama berulang kali dari database, sehingga dapat mengurangi beban query dan mempercepat respon API.  
+Jika data sudah ada di cache (misalnya Redis), maka akan langsung digunakan. Jika belum ada, data akan diambil dari database lalu disimpan ke cache untuk permintaan berikutnya.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### 1. GET /api/categories
 
-### Premium Partners
+Mengambil semua data kategori.
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+**Skenario cache:**
 
-## Contributing
+-   Jika data tidak ada di Redis, ambil dari database lalu simpan ke Redis.
+-   Jika data ada di Redis, langsung kirim data dari cache.
+-   Jika ada penambahan, perubahan, atau hapus data maka cache akan langsung dihapus agar data menjadi konsisten.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+**Kode:**
 
-## Code of Conduct
+```php
+ public function getAllCategories(): Collection
+    {
+        // cache selama 10 menit
+        Log::info('Fetching all categories from cache.');
+        return Cache::remember('categories_all', 600, function () {
+            return $this->categoryRepository->getAll();
+        });
+    }
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+**Hapus jika ada penambahan, perubahan, hapus data:**
 
-## Security Vulnerabilities
+```php
+// penambahan data
+    public function createNewCategory(array $data): Category
+    {
+        $category = $this->categoryRepository->findByName($data['name']);
+        if ($category) {
+            throw new CategoryAlreadyExistsException();
+        }
+        Cache::forget('categories_all');
+        return Category::create($data);
+    }
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+    // update
+    public function update(string $id, array $data): Category
+    {
+        $this->getCategoryById($id);
+        Cache::forget('categories_all');
+        return $this->categoryRepository->update($id, $data);
+    }
 
-## License
+    // delete
+    public function delete(string $id): bool
+    {
+        $this->getCategoryById($id);
+        Cache::forget('categories_all');
+        return $this->categoryRepository->delete($id);
+    }
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+---
+
+### 2. GET /api/courses
+
+Mengambil semua data kursus.
+
+**Skenario cache:**
+
+-   Jika data tidak ada di Redis, ambil dari database lalu simpan ke Redis.
+-   Jika data ada di Redis, langsung kirim data dari cache.
+-   Jika ada penambahan, perubahan, atau hapus data maka cache akan langsung dihapus agar data menjadi konsisten.
+
+**Kode:**
+
+```php
+    public function getAllCourses(): Collection
+    {
+        // return $this->courseRepository->getAll();
+        Log::info("fetching all courses from cache");
+        return Cache::remember("all_courses", 600, function () {
+            Log::info("fetching all courses from database");
+            return $this->courseRepository->getAll();
+        });
+    }
+```
+
+**Hapus jika ada penambahan, perubahan, hapus data:**
+
+```php
+// penambahan data
+    public function createCourse(array $data, User $user): Course
+    {
+        // Contoh: Logika bisnis di sini, misalnya validasi role user
+        $instructor = $user->role;
+        if ($instructor === "STUDENT") {
+            throw new UnauthorizedException();
+        }
+        $course = $this->courseRepository->findByTitle($data['title']);
+        if ($course) {
+            throw new CourseAlreadyExistsException();
+        }
+        Log::info("revalidate all courses cache");
+        Cache::forget('all_courses');
+        return $this->courseRepository->create($data);
+    }
+
+    // update
+    public function updateCourse(string $id, array $data): Course
+    {
+        $this->getCourseById($id);
+        Log::info("revalidate all courses cache");
+        Cache::forget('all_courses');
+        return $this->courseRepository->update($id, $data);
+    }
+
+    // delete
+    public function deleteCourse(string $id): bool
+    {
+        $this->getCourseById($id);
+        Log::info("revalidate all courses cache");
+        Cache::forget('all_courses');
+        return $this->courseRepository->delete($id);
+    }
+```
+
+### 3. GET /api/enrollments/my-courses
+
+Mengambil semua kursus yang sudah dibeli user (payment status = PAID).
+
+**Skenario cache:**
+
+-   Jika data kursus user tidak ada di Redis, ambil dari database lalu simpan ke Redis.
+-   Jika data kursus user ada di Redis, langsung kirim data dari cache.
+-   Cache akan dihapus (invalidate) ketika user membeli course baru, status pembayaran berubah, atau enrollment dihapus.
+-   Jika ada penambahan, perubahan, atau hapus data maka cache akan langsung dihapus agar data menjadi konsisten.
+
+**Kode:**
+
+```php
+    public function getMyCourses(string $studentId): Collection
+    {
+        // cache selamat 5 menit
+        Log::info('Fetching all my courses from cache.');
+        return Cache::remember("user_{$studentId}_my_courses", 300, function () use ($studentId) {
+            Log::info('Fetching all my courses from database.');
+            return $this->enrollmentRepository->getPurchasedByUser($studentId);
+        });
+    }
+```
+
+**Hapus jika ada penambahan, perubahan, hapus data:**
+
+```php
+    // penambahan data
+    /**
+     * Membuat pendaftaran baru/membeli course.
+     *
+     * @param array $data
+     * @throws EnrollCourseAlreadyExistsException
+     * @return Enrollment
+     */
+    public function enrollStudentInCourse(array $data): Enrollment
+    {
+        $enrollment = $this->enrollmentRepository->findByStudentAndCourse($data['student_id'], $data['course_id']);
+
+        if ($enrollment) {
+            throw new EnrollCourseAlreadyExistsException();
+        }
+        Cache::forget("user_{$data['student_id']}_my_courses");
+        return $this->enrollmentRepository->create($data);
+    }
+
+    // update
+    public function updateEnrollment(string $enrollmentId, array $data): Enrollment
+    {
+        // Panggil metode getEnrollmentById untuk memeriksa keberadaan pendaftaran
+        $enrollment = $this->getEnrollmentById($enrollmentId);
+        Cache::forget("user_{$enrollment->student_id}_my_courses");
+        return $this->enrollmentRepository->update($enrollmentId, $data);
+    }
+
+    // delete
+    /**
+     * Menghapus pendaftaran dari database.
+     *
+     * @param string $enrollmentId ID dari pendaftaran yang akan dihapus.
+     * @return bool Mengembalikan true jika penghapusan berhasil.
+     * @throws EnrollNotFoundException Jika pendaftaran tidak ditemukan.
+     * @throws UnauthorizedException Jika role bukan admin.
+     */
+    public function deleteEnrollment(string $enrollmentId, User $user): bool
+    {
+        if ($user->role !== "ADMIN") {
+            throw new UnauthorizedException();
+        }
+        // Panggil metode getEnrollmentById untuk memeriksa keberadaan pendaftaran
+        $enrollment = $this->getEnrollmentById($enrollmentId);
+        Cache::forget("user_{$enrollment->student_id}_my_courses");
+
+        return $this->enrollmentRepository->delete($enrollmentId);
+    }
+```
+
+---
