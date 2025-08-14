@@ -31,7 +31,7 @@ Mendukung **caching dengan Redis** untuk meningkatkan performa, serta **logging*
 
 Caching digunakan untuk menyimpan data yang sifatnya statis atau jarang berubah Dengan caching, sistem tidak perlu mengambil data yang sama berulang kali dari database, sehingga dapat mengurangi beban query dan mempercepat respon API. Jika data sudah ada di cache (misalnya Redis), maka akan langsung digunakan. Jika belum ada, data akan diambil dari database lalu disimpan ke cache untuk permintaan berikutnya.
 
-### 1. GET /api/categories
+### 1. GET /api/categories (Layer Service)
 
 Mengambil semua data kategori.
 
@@ -87,7 +87,7 @@ Mengambil semua data kategori.
 
 ---
 
-### 2. GET /api/courses
+### 2. GET /api/courses (Layer Service)
 
 Mengambil semua data kursus.
 
@@ -150,7 +150,7 @@ Mengambil semua data kursus.
     }
 ```
 
-### 3. GET /api/enrollments/my-courses
+### 3. GET /api/enrollments/my-courses (Layer Service)
 
 Mengambil semua kursus yang sudah dibeli user (payment status = PAID).
 
