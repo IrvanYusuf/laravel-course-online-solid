@@ -29,9 +29,7 @@ Mendukung **caching dengan Redis** untuk meningkatkan performa, serta **logging*
 
 ## 🚀 Caching
 
-Caching digunakan untuk menyimpan data yang sifatnya statis atau jarang berubah.  
-Dengan caching, sistem tidak perlu mengambil data yang sama berulang kali dari database, sehingga dapat mengurangi beban query dan mempercepat respon API.  
-Jika data sudah ada di cache (misalnya Redis), maka akan langsung digunakan. Jika belum ada, data akan diambil dari database lalu disimpan ke cache untuk permintaan berikutnya.
+Caching digunakan untuk menyimpan data yang sifatnya statis atau jarang berubah Dengan caching, sistem tidak perlu mengambil data yang sama berulang kali dari database, sehingga dapat mengurangi beban query dan mempercepat respon API. Jika data sudah ada di cache (misalnya Redis), maka akan langsung digunakan. Jika belum ada, data akan diambil dari database lalu disimpan ke cache untuk permintaan berikutnya.
 
 ### 1. GET /api/categories
 
