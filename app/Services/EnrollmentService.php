@@ -9,6 +9,8 @@ use App\Models\Enrollment;
 use App\Models\User;
 use App\Repositories\Interfaces\EnrollmentRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 
 class EnrollmentService
 {
@@ -49,7 +51,7 @@ class EnrollmentService
         if ($enrollment) {
             throw new EnrollCourseAlreadyExistsException();
         }
-
+        Cache::forget("user_{$data['student_id']}_my_courses");
         return $this->enrollmentRepository->create($data);
     }
 
@@ -61,7 +63,12 @@ class EnrollmentService
      */
     public function getMyCourses(string $studentId): Collection
     {
-        return $this->enrollmentRepository->getPurchasedByUser($studentId);
+        // cache selamat 5 menit
+        Log::info('Fetching all my courses from cache.');
+        return Cache::remember("user_{$studentId}_my_courses", 300, function () use ($studentId) {
+            Log::info('Fetching all my courses from database.');
+            return $this->enrollmentRepository->getPurchasedByUser($studentId);
+        });
     }
 
 
@@ -92,8 +99,8 @@ class EnrollmentService
     public function updateEnrollment(string $enrollmentId, array $data): Enrollment
     {
         // Panggil metode getEnrollmentById untuk memeriksa keberadaan pendaftaran
-        $this->getEnrollmentById($enrollmentId);
-
+        $enrollment = $this->getEnrollmentById($enrollmentId);
+        Cache::forget("user_{$enrollment->student_id}_my_courses");
         return $this->enrollmentRepository->update($enrollmentId, $data);
     }
 
@@ -111,7 +118,8 @@ class EnrollmentService
             throw new UnauthorizedException();
         }
         // Panggil metode getEnrollmentById untuk memeriksa keberadaan pendaftaran
-        $this->getEnrollmentById($enrollmentId);
+        $enrollment = $this->getEnrollmentById($enrollmentId);
+        Cache::forget("user_{$enrollment->student_id}_my_courses");
 
         return $this->enrollmentRepository->delete($enrollmentId);
     }

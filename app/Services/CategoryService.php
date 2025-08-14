@@ -7,6 +7,8 @@ use App\Exceptions\CategoryNotFoundException;
 use App\Models\Category;
 use App\Repositories\Interfaces\CategoryRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 
 class CategoryService
 {
@@ -23,8 +25,11 @@ class CategoryService
      */
     public function getAllCategories(): Collection
     {
-        $categories = $this->categoryRepository->getAll();
-        return $categories;
+        // cache selama 10 menit
+        Log::info('Fetching all categories from cache.');
+        return Cache::remember('categories_all', 600, function () {
+            return $this->categoryRepository->getAll();
+        });
     }
 
     /**
@@ -57,6 +62,7 @@ class CategoryService
         if ($category) {
             throw new CategoryAlreadyExistsException();
         }
+        Cache::forget('categories_all');
         return Category::create($data);
     }
 
@@ -71,6 +77,7 @@ class CategoryService
     public function update(string $id, array $data): Category
     {
         $this->getCategoryById($id);
+        Cache::forget('categories_all');
         return $this->categoryRepository->update($id, $data);
     }
 
@@ -83,6 +90,7 @@ class CategoryService
     public function delete(string $id): bool
     {
         $this->getCategoryById($id);
+        Cache::forget('categories_all');
         return $this->categoryRepository->delete($id);
     }
 }

@@ -9,6 +9,8 @@ use App\Models\Course;
 use App\Models\User;
 use App\Repositories\Interfaces\CourseRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 
 class CourseService
 {
@@ -28,7 +30,12 @@ class CourseService
      */
     public function getAllCourses(): Collection
     {
-        return $this->courseRepository->getAll();
+        // return $this->courseRepository->getAll();
+        Log::info("fetching all courses from cache");
+        return Cache::remember("all_courses", 600, function () {
+            Log::info("fetching all courses from database");
+            return $this->courseRepository->getAll();
+        });
     }
 
     /**
@@ -43,7 +50,7 @@ class CourseService
         if (!$course) {
             throw new CourseNotFoundException();
         }
-        return $this->courseRepository->find($id);
+        return $course;
     }
 
     /**
@@ -79,6 +86,8 @@ class CourseService
         if ($course) {
             throw new CourseAlreadyExistsException();
         }
+        Log::info("revalidate all courses cache");
+        Cache::forget('all_courses');
         return $this->courseRepository->create($data);
     }
 
@@ -92,6 +101,8 @@ class CourseService
     public function updateCourse(string $id, array $data): Course
     {
         $this->getCourseById($id);
+        Log::info("revalidate all courses cache");
+        Cache::forget('all_courses');
         return $this->courseRepository->update($id, $data);
     }
 
@@ -104,6 +115,8 @@ class CourseService
     public function deleteCourse(string $id): bool
     {
         $this->getCourseById($id);
+        Log::info("revalidate all courses cache");
+        Cache::forget('all_courses');
         return $this->courseRepository->delete($id);
     }
 }
